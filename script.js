@@ -114,6 +114,7 @@ const state = {
   audioContext: null,
   confirmationTimerId: null,
   confettiFrameId: null,
+  currentTicketData: null,
   soundEnabled: true,
   hasConfirmed: false,
   prefersReducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)")
@@ -218,6 +219,7 @@ function sanitizeGuestCount(value) {
 }
 
 function applyTicketData(ticketData) {
+  state.currentTicketData = ticketData;
   elements.familyName.textContent = ticketData.familyDisplayName;
   elements.ticketNumber.textContent = ticketData.ticketNumber;
   elements.guestCount.textContent = ticketData.guestCount;
@@ -466,6 +468,13 @@ function launchConfetti() {
 }
 
 async function playConfirmationSound({ requireUserGesture = false } = {}) {
+  const spokenAnnouncement = buildConfirmationAnnouncement();
+
+  if (spokenAnnouncement && canUseSpeechSynthesis()) {
+    await speakConfirmationAnnouncement(spokenAnnouncement);
+    return;
+  }
+
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 
   if (!AudioContextClass) {
@@ -508,6 +517,55 @@ async function playConfirmationSound({ requireUserGesture = false } = {}) {
   oscillator.stop(currentTime + 0.3);
 
   await wait(180);
+}
+
+function buildConfirmationAnnouncement() {
+  const ticketData = state.currentTicketData;
+
+  if (!ticketData) {
+    return "Ticket confirmed. Please enjoy the game.";
+  }
+
+  return `${ticketData.familyName}, your ticket has been confirmed. Please enjoy the game.`;
+}
+
+function canUseSpeechSynthesis() {
+  return (
+    typeof window !== "undefined" &&
+    "speechSynthesis" in window &&
+    typeof window.SpeechSynthesisUtterance === "function"
+  );
+}
+
+async function speakConfirmationAnnouncement(message) {
+  window.speechSynthesis.cancel();
+
+  await new Promise((resolve, reject) => {
+    const utterance = new SpeechSynthesisUtterance(message);
+    let hasFinished = false;
+
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    utterance.onend = () => {
+      hasFinished = true;
+      resolve();
+    };
+
+    utterance.onerror = () => {
+      hasFinished = true;
+      reject(new Error("Speech synthesis could not play the confirmation announcement."));
+    };
+
+    window.speechSynthesis.speak(utterance);
+
+    window.setTimeout(() => {
+      if (!hasFinished) {
+        resolve();
+      }
+    }, 5000);
+  });
 }
 
 async function resumeAudioContext(audioContext) {
