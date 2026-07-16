@@ -78,6 +78,7 @@ body::after {
   position: relative;
   z-index: 1;
   min-height: 100vh;
+  min-height: 100svh;
   padding: calc(env(safe-area-inset-top, 0px) + 24px) var(--page-padding)
     calc(env(safe-area-inset-bottom, 0px) + 28px);
   display: grid;
@@ -703,6 +704,198 @@ body::after {
     padding: var(--card-padding);
   }
 
+}
+
+@media (max-width: 480px) {
+  :root {
+    --page-padding: 14px;
+    --card-padding: 16px;
+  }
+
+  .page-shell {
+    gap: 12px;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+    align-content: start;
+  }
+
+  .eyebrow {
+    margin-bottom: 6px;
+    font-size: 0.82rem;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(1.9rem, 13vw, 3rem);
+    line-height: 0.96;
+  }
+
+  .hero-subtitle {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    line-height: 1.35;
+  }
+
+  .card-topbar {
+    margin:
+      calc(var(--card-padding) * -1)
+      calc(var(--card-padding) * -1)
+      12px;
+    padding: 12px var(--card-padding);
+  }
+
+  .status-pill,
+  .sound-toggle {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 0.8rem;
+  }
+
+  .scan-stage {
+    padding: 18px 0 4px;
+  }
+
+  .scanner-orb {
+    width: 104px;
+    height: 104px;
+  }
+
+  .scanner-core {
+    inset: 26px;
+  }
+
+  .scanner-beam {
+    width: 88px;
+  }
+
+  .scan-label {
+    margin-top: 12px;
+    font-size: 0.88rem;
+  }
+
+  .scan-hint {
+    font-size: 0.86rem;
+    line-height: 1.3;
+  }
+
+  .ticket-card.is-confirmed .confirmation-stage {
+    margin-top: 10px;
+    padding-top: 8px;
+    max-height: 300px;
+  }
+
+  .checkmark-badge {
+    width: 86px;
+    height: 86px;
+  }
+
+  .checkmark-badge.has-family-photo::after {
+    width: 28px;
+    height: 28px;
+    bottom: -8px;
+  }
+
+  .checkmark-badge.has-family-photo::before {
+    bottom: 1px;
+    width: 6px;
+    height: 10px;
+  }
+
+  .confirmation-kicker {
+    margin: 12px 0 6px;
+    font-size: 0.82rem;
+  }
+
+  .confirmation-stage h2 {
+    font-size: 0.88rem;
+  }
+
+  .family-name {
+    margin: 6px 0;
+    font-size: clamp(1.95rem, 12vw, 2.8rem);
+    line-height: 0.92;
+  }
+
+  .ticket-caption {
+    font-size: 0.88rem;
+    line-height: 1.28;
+  }
+
+  .details-panel {
+    margin-top: 12px;
+    padding: 12px 14px;
+  }
+
+  .detail-grid {
+    gap: 8px;
+  }
+
+  .detail-row {
+    gap: 12px;
+  }
+
+  .detail-row dt,
+  .detail-row dd {
+    font-size: 0.84rem;
+    line-height: 1.2;
+  }
+
+  .manual-confirm-copy,
+  .ready-message {
+    margin-top: 12px;
+    font-size: 0.84rem;
+    line-height: 1.3;
+  }
+
+  .action-stack {
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .ghost-button {
+    min-height: 48px;
+    padding: 12px 16px;
+    font-size: 0.92rem;
+  }
+
+  .privacy-note {
+    margin-top: 12px;
+    font-size: 0.76rem;
+    line-height: 1.25;
+  }
+}
+
+@media (max-width: 480px) and (max-height: 860px) {
+  .hero-copy {
+    max-width: 100%;
+  }
+
+  .hero-subtitle {
+    display: none;
+  }
+
+  .checkmark-badge {
+    width: 78px;
+    height: 78px;
+  }
+
+  .family-name {
+    font-size: clamp(1.72rem, 10vw, 2.45rem);
+  }
+
+  .ticket-caption {
+    font-size: 0.82rem;
+  }
+
+  .detail-row dt,
+  .detail-row dd {
+    font-size: 0.8rem;
+  }
+
+  .privacy-note {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
