@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>World Cup Watch Party Check-In</title>
+    <meta
+      name="description"
+      content="Mobile-first QR ticket check-in page for a private World Cup watch party."
+    />
+    <link rel="stylesheet" href="styles.css?v=20260716a" />
+  </head>
+  <body>
+    <canvas
+      id="confetti-canvas"
+      class="confetti-canvas"
+      aria-hidden="true"
+    ></canvas>
+
+    <main class="page-shell">
+      <section class="hero-copy" aria-label="Event header">
+        <p class="eyebrow">Welcome to Daniel's Stadium</p>
+        <h1>World Cup Watch Party</h1>
+        <p class="hero-subtitle">
+          Match Day entry check-in for family tickets.
+        </p>
+      </section>
+
+      <section class="ticket-card" aria-labelledby="entry-heading">
+        <div class="card-topbar">
+          <span class="status-pill">Match Day</span>
+          <button
+            id="sound-toggle"
+            class="sound-toggle"
+            type="button"
+            aria-pressed="true"
+          >
+            Sound: On
+          </button>
+        </div>
+
+        <div class="scan-stage" id="scan-stage" aria-hidden="false">
+          <div class="scanner-orb" aria-hidden="true">
+            <span class="scanner-ring scanner-ring-one"></span>
+            <span class="scanner-ring scanner-ring-two"></span>
+            <span class="scanner-beam"></span>
+            <span class="scanner-core"></span>
+          </div>
+          <p class="scan-label" id="scan-label">Verifying ticket...</p>
+          <p class="scan-hint" id="scan-hint">
+            Hold steady while entry is confirmed.
+          </p>
+        </div>
+
+        <div class="confirmation-stage" id="confirmation-stage">
+          <div class="checkmark-badge" aria-hidden="true">
+            <img
+              id="confirmation-photo-image"
+              class="confirmation-photo-image"
+              src=""
+              alt=""
+              loading="lazy"
+              decoding="async"
+              hidden
+            />
+            <span class="checkmark-stem"></span>
+            <span class="checkmark-kick"></span>
+          </div>
+          <p class="confirmation-kicker">Entry Confirmed</p>
+          <h2 id="entry-heading">Welcome,</h2>
+          <p class="family-name" id="family-name">GUEST FAMILY</p>
+          <p class="ticket-caption" id="ticket-caption">
+            Your watch party ticket is ready.
+          </p>
+          <figure
+            id="confirmation-wide-photo-panel"
+            class="confirmation-wide-photo-panel"
+            hidden
+          >
+            <img
+              id="confirmation-wide-photo-image"
+              class="confirmation-wide-photo-image"
+              src=""
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption
+              id="confirmation-wide-photo-caption"
+              class="confirmation-wide-photo-caption"
+            >
+              Family verification photo
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="details-panel" aria-label="Ticket details">
+          <dl class="detail-grid">
+            <div class="detail-row">
+              <dt>Ticket No.</dt>
+              <dd id="ticket-number">General Admission</dd>
+            </div>
+            <div class="detail-row">
+              <dt>Guests</dt>
+              <dd id="guest-count">Not listed</dd>
+            </div>
+            <div class="detail-row">
+              <dt>Gate</dt>
+              <dd id="gate-name">Gate A</dd>
+            </div>
+            <div class="detail-row">
+              <dt>Section</dt>
+              <dd id="section-name">Living Room</dd>
+            </div>
+            <div class="detail-row">
+              <dt>Kickoff</dt>
+              <dd id="kickoff-time">2:00 PM</dd>
+            </div>
+          </dl>
+        </div>
+
+        <p id="manual-confirm-copy" class="manual-confirm-copy" hidden>
+          Tap below to play the confirmation sound and finish check-in.
+        </p>
+
+        <div class="action-stack">
+          <button
+            id="manual-confirm-button"
+            class="primary-button"
+            type="button"
+            hidden
+          >
+            Tap to Confirm Entry
+          </button>
+          <button
+            id="next-guest-button"
+            class="secondary-button"
+            type="button"
+            hidden
+          >
+            Done - Go Back To Scan
+          </button>
+        </div>
+
+        <p class="ready-message" id="ready-message" hidden>
+          Ready for the next guest. Scan another QR ticket.
+        </p>
+
+        <p class="privacy-note">
+          This page does not store data, use cookies, or send analytics.
+        </p>
+
+        <p id="status-live" class="sr-only" aria-live="polite">
+          Ticket loaded.
+        </p>
+      </section>
+    </main>
+
+    <noscript>
+      <section class="noscript-note">
+        JavaScript is off. Welcome, Guest Family. Ticket No. General Admission.
+        Gate A. Section: Living Room. Kickoff: 2:00 PM.
+      </section>
+    </noscript>
+
+    <script src="script.js?v=20260716a" defer></script>
+  </body>
+</html>
