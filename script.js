@@ -115,6 +115,7 @@ const state = {
   confirmationTimerId: null,
   confettiFrameId: null,
   currentTicketData: null,
+  manualAudioPending: false,
   soundEnabled: true,
   hasConfirmed: false,
   prefersReducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)")
@@ -236,6 +237,7 @@ function showStandbyScreen() {
   window.clearTimeout(state.confirmationTimerId);
   stopConfetti();
   state.hasConfirmed = false;
+  resetManualAudioPrompt();
 
   elements.ticketCard.classList.remove("is-confirmed");
   elements.ticketCard.classList.remove("has-wide-photo");
@@ -246,8 +248,6 @@ function showStandbyScreen() {
   elements.confirmationWidePhotoPanel.hidden = true;
   elements.confirmationWidePhotoImage.removeAttribute("src");
   elements.confirmationWidePhotoImage.alt = "";
-  elements.manualConfirmCopy.hidden = true;
-  elements.manualConfirmButton.hidden = true;
   elements.nextGuestButton.hidden = true;
   elements.readyMessage.hidden = false;
   elements.readyMessage.textContent =
@@ -314,6 +314,13 @@ function bindEvents() {
     elements.manualConfirmButton.disabled = true;
 
     try {
+      if (state.manualAudioPending) {
+        await playConfirmationSound({ requireUserGesture: true });
+        resetManualAudioPrompt();
+        elements.statusLive.textContent = "Welcome sound played.";
+        return;
+      }
+
       await completeCheckIn({ requireUserGesture: true });
     } finally {
       elements.manualConfirmButton.disabled = false;
@@ -328,10 +335,9 @@ function startCheckInAnimation() {
   window.clearTimeout(state.confirmationTimerId);
   stopConfetti();
   state.hasConfirmed = false;
+  resetManualAudioPrompt();
 
   elements.ticketCard.classList.remove("is-confirmed");
-  elements.manualConfirmCopy.hidden = true;
-  elements.manualConfirmButton.hidden = true;
   elements.nextGuestButton.hidden = true;
   elements.readyMessage.hidden = true;
   elements.scanLabel.textContent = state.prefersReducedMotion
@@ -360,36 +366,48 @@ async function completeCheckIn({
     return;
   }
 
+  let needsManualAudioPrompt = false;
+
   if (state.soundEnabled) {
     try {
       await playConfirmationSound({ requireUserGesture });
     } catch (error) {
       if (!requireUserGesture) {
-        showManualConfirmationFallback();
-        return;
+        needsManualAudioPrompt = true;
       }
     }
   }
 
   showConfirmation({ skipDelay });
+
+  if (needsManualAudioPrompt) {
+    showManualAudioFallback();
+  }
 }
 
-function showManualConfirmationFallback() {
-  window.clearTimeout(state.confirmationTimerId);
-  elements.scanLabel.textContent = "Confirmation ready";
-  elements.scanHint.textContent =
-    "Your browser is waiting for a tap before it can play sound.";
+function resetManualAudioPrompt() {
+  state.manualAudioPending = false;
+  elements.manualConfirmCopy.textContent =
+    "Tap below to play the confirmation sound and finish check-in.";
+  elements.manualConfirmCopy.hidden = true;
+  elements.manualConfirmButton.textContent = "Tap to Confirm Entry";
+  elements.manualConfirmButton.hidden = true;
+}
+
+function showManualAudioFallback() {
+  state.manualAudioPending = true;
+  elements.manualConfirmCopy.textContent =
+    "Tap below to play the welcome sound in your browser.";
   elements.manualConfirmCopy.hidden = false;
+  elements.manualConfirmButton.textContent = "Play Welcome Sound";
   elements.manualConfirmButton.hidden = false;
   elements.statusLive.textContent =
-    "Tap to confirm entry and play the confirmation sound.";
+    "Entry confirmed. Tap to play the welcome sound.";
 }
 
 function showConfirmation({ skipDelay = false } = {}) {
   state.hasConfirmed = true;
   elements.ticketCard.classList.add("is-confirmed");
-  elements.manualConfirmCopy.hidden = true;
-  elements.manualConfirmButton.hidden = true;
   elements.nextGuestButton.hidden = false;
   elements.scanLabel.textContent = "Check-in complete";
   elements.scanHint.textContent = "Enjoy the match.";
@@ -471,7 +489,9 @@ async function playConfirmationSound({ requireUserGesture = false } = {}) {
   const spokenAnnouncement = buildConfirmationAnnouncement();
 
   if (spokenAnnouncement && canUseSpeechSynthesis()) {
-    await speakConfirmationAnnouncement(spokenAnnouncement);
+    await speakConfirmationAnnouncement(spokenAnnouncement, {
+      requireUserGesture,
+    });
     return;
   }
 
@@ -523,10 +543,10 @@ function buildConfirmationAnnouncement() {
   const ticketData = state.currentTicketData;
 
   if (!ticketData) {
-    return "Ticket confirmed. Please enjoy the game.";
+    return "Entry confirmed. Welcome. Enjoy the match!";
   }
 
-  return `${ticketData.familyName}, your ticket has been confirmed. Please enjoy the game.`;
+  return `Entry confirmed. Welcome, ${ticketData.familyName}. Enjoy the match!`;
 }
 
 function canUseSpeechSynthesis() {
@@ -537,34 +557,59 @@ function canUseSpeechSynthesis() {
   );
 }
 
-async function speakConfirmationAnnouncement(message) {
+async function speakConfirmationAnnouncement(
+  message,
+  { requireUserGesture = false } = {},
+) {
   window.speechSynthesis.cancel();
 
   await new Promise((resolve, reject) => {
     const utterance = new SpeechSynthesisUtterance(message);
+    let hasStarted = false;
     let hasFinished = false;
+    let startupTimerId = null;
+    let finishTimerId = null;
 
     utterance.rate = 1;
     utterance.pitch = 1;
     utterance.volume = 1;
 
+    const cleanup = () => {
+      window.clearTimeout(startupTimerId);
+      window.clearTimeout(finishTimerId);
+    };
+
+    utterance.onstart = () => {
+      hasStarted = true;
+    };
+
     utterance.onend = () => {
       hasFinished = true;
+      cleanup();
       resolve();
     };
 
     utterance.onerror = () => {
       hasFinished = true;
+      cleanup();
       reject(new Error("Speech synthesis could not play the confirmation announcement."));
     };
 
     window.speechSynthesis.speak(utterance);
 
-    window.setTimeout(() => {
+    startupTimerId = window.setTimeout(() => {
+      if (!hasStarted && !hasFinished && !requireUserGesture) {
+        cleanup();
+        reject(new Error("Speech synthesis needs a user gesture."));
+      }
+    }, 900);
+
+    finishTimerId = window.setTimeout(() => {
       if (!hasFinished) {
+        cleanup();
         resolve();
       }
-    }, 5000);
+    }, 6000);
   });
 }
 
@@ -624,6 +669,10 @@ function toggleSound() {
   elements.statusLive.textContent = state.soundEnabled
     ? "Confirmation sound enabled."
     : "Confirmation sound muted.";
+
+  if (!state.soundEnabled && state.manualAudioPending) {
+    resetManualAudioPrompt();
+  }
 
   if (!state.soundEnabled && !state.hasConfirmed && !elements.manualConfirmButton.hidden) {
     showConfirmation();
