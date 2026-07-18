@@ -63,6 +63,18 @@ const FAMILY_CUSTOMIZATIONS = {
       caption: "Euna Park verification photo",
     },
   },
+  "yeseon yu": {
+    kicker: "Yeseon Yu Verification",
+    title: "Guest Photo Check",
+    copy:
+      "Use this photo after confirmation to verify Yeseon Yu's ticket matches the arriving guest.",
+    guestCountOverride: "1",
+    image: {
+      src: window.FAMILY_IMAGE_DATA?.yeseonYu ?? "",
+      alt: "Yeseon Yu portrait used for match day verification.",
+      caption: "Yeseon Yu verification photo",
+    },
+  },
   "lim family": {
     kicker: "Lim Family Verification",
     title: "Family Photo Check",
