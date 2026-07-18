@@ -51,6 +51,18 @@ const FAMILY_CUSTOMIZATIONS = {
       caption: "Daniel Moon verification photo",
     },
   },
+  "euna park": {
+    kicker: "Euna Park Verification",
+    title: "Guest Photo Check",
+    copy:
+      "Use this photo after confirmation to verify Euna Park's ticket matches the arriving guest.",
+    guestCountOverride: "1",
+    image: {
+      src: window.FAMILY_IMAGE_DATA?.eunaPark ?? "",
+      alt: "Euna Park portrait used for match day verification.",
+      caption: "Euna Park verification photo",
+    },
+  },
   "lim family": {
     kicker: "Lim Family Verification",
     title: "Family Photo Check",
