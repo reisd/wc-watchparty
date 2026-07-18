@@ -75,6 +75,28 @@ const FAMILY_CUSTOMIZATIONS = {
       caption: "Yeseon Yu verification photo",
     },
   },
+  "shim family": {
+    kicker: "Shim Family Verification",
+    title: "Family Photo Check",
+    copy:
+      "Use this photo after confirmation to verify the Shim Family ticket matches the arriving guests.",
+    image: {
+      src: window.FAMILY_IMAGE_DATA?.shimFamily ?? "",
+      alt: "Shim family photo used for match day verification.",
+      caption: "Shim Family verification photo",
+    },
+  },
+  "shim's family": {
+    kicker: "Shim Family Verification",
+    title: "Family Photo Check",
+    copy:
+      "Use this photo after confirmation to verify the Shim Family ticket matches the arriving guests.",
+    image: {
+      src: window.FAMILY_IMAGE_DATA?.shimFamily ?? "",
+      alt: "Shim family photo used for match day verification.",
+      caption: "Shim Family verification photo",
+    },
+  },
   "lim family": {
     kicker: "Lim Family Verification",
     title: "Family Photo Check",
